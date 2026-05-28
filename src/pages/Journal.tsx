@@ -12,6 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useSpeak, vibrate } from "@/lib/speech";
 import { notify } from "@/lib/notify";
+import { useSearchParams } from "react-router-dom";
+import { getLessonById } from "@/data/lessons";
+import { bumpLesson } from "@/lib/lessonProgress";
 
 interface Entry { id: string; emotion: EmotionKey; note: string | null; created_at: string; }
 
@@ -19,6 +22,11 @@ const MAX_NOTE = 300;
 
 const Journal = () => {
   const { user } = useAuth();
+  const [params] = useSearchParams();
+  const lesson = (() => {
+    const id = params.get("lesson");
+    return id ? getLessonById(id) : undefined;
+  })();
   const [pick, setPick] = useState<EmotionKey | null>(null);
   const [note, setNote] = useState("");
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -50,6 +58,7 @@ const Journal = () => {
     const { error } = await supabase.from("journal_entries").insert({ user_id: user.id, emotion: pick, note: note.trim() || null });
     if (error) return notify.error("Chưa lưu được. Thử lại nhé.");
     vibrate(15);
+    if (lesson) bumpLesson(lesson.id, lesson.threshold, true);
     setPick(null); setNote("");
     notify.success("Đã lưu! Cảm ơn bạn đã chia sẻ 💛");
     speak("Đã lưu. Cảm ơn bạn đã chia sẻ");

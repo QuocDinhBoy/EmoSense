@@ -88,7 +88,7 @@ export const vibrate = (pattern: number | number[] = 15) => {
   } catch {}
 };
 
-/** Hook: tự tôn trọng cài đặt sound_on. Trả về speak/stop. */
+/** Hook: tự tôn trọng cài đặt sound_on + ASD preferences. Trả về speak/stop. */
 export function useSpeak() {
   const { profile } = useProfile();
   const enabledRef = useRef<boolean>(true);
@@ -99,7 +99,17 @@ export function useSpeak() {
 
   const speak = useCallback((text: string, opts?: SpeakOptions) => {
     if (!enabledRef.current) return;
-    void speakVi(text, opts);
+    // Đọc ASD prefs từ localStorage trực tiếp (tránh thêm dependency)
+    let rate = opts?.rate ?? 0.95;
+    try {
+      const raw = localStorage.getItem("emosense.asd-prefs");
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p.speechRate === "slow") rate = 0.75;
+        else if (p.speechRate === "fast") rate = 1.15;
+      }
+    } catch { /* ignore */ }
+    void speakVi(text, { ...opts, rate });
   }, []);
 
   const stop = useCallback(() => cancelSpeech(), []);

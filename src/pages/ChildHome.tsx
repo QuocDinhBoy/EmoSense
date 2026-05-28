@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { ALL_LESSONS, lessonHref } from "@/data/lessons";
+import { getLessonState, useLessonProgressTick } from "@/lib/lessonProgress";
 import learnImg from "@/assets/tiles/learn.png";
 import flashcardsImg from "@/assets/tiles/flashcards.png";
 import matchImg from "@/assets/tiles/match.png";
@@ -18,7 +20,7 @@ const tiles = [
   { to: "/app/learn", title: "Bản đồ học tập", desc: "Cấp độ & bài học", img: learnImg, bg: "bg-gradient-sky" },
   { to: "/app/flashcards", title: "Thẻ học", desc: "Luyện cảm xúc", img: flashcardsImg, bg: "bg-gradient-bubble" },
   { to: "/app/match", title: "Trò chơi ghép", desc: "Kéo & ghép", img: matchImg, bg: "bg-gradient-mint" },
-  { to: "/app/camera", title: "Luyện qua camera", desc: "Thể hiện một cảm xúc", img: cameraImg, bg: "bg-gradient-sunshine" },
+  { to: "/app/camera", title: "Luyện qua camera", desc: "AI hướng dẫn theo thời gian thực", img: cameraImg, bg: "bg-gradient-sunshine" },
   { to: "/app/scenarios", title: "Tình huống", desc: "Bạn sẽ cảm thấy thế nào?", img: scenariosImg, bg: "bg-gradient-sky" },
   { to: "/app/journal", title: "Nhật ký", desc: "Hôm nay bạn thấy sao?", img: journalImg, bg: "bg-gradient-bubble" },
 ];
@@ -28,9 +30,11 @@ const ChildHome = () => {
   const { user } = useAuth();
   const reduce = !!profile?.reduced_motion;
   const name = profile?.display_name ?? "bạn nhỏ";
+  const tick = useLessonProgressTick();
   const [next, setNext] = useState<{ to: string; label: string }>({ to: "/app/learn", label: "Tiếp tục học" });
 
   useEffect(() => {
+    void tick;
     if (!user) return;
     (async () => {
       const { data } = await supabase.from("progress").select("activity, correct").eq("user_id", user.id);
@@ -38,17 +42,20 @@ const ChildHome = () => {
       (data ?? []).forEach((r: any) => {
         totals[r.activity] = (totals[r.activity] ?? 0) + (r.correct ?? 0);
       });
-      // Heuristic: route to first activity with low totals
-      const order: { key: string; to: string; label: string }[] = [
-        { key: "flashcards", to: "/app/flashcards", label: "Học thẻ cảm xúc" },
-        { key: "match", to: "/app/match", label: "Chơi ghép cảm xúc" },
-        { key: "camera", to: "/app/camera", label: "Luyện qua camera" },
-        { key: "scenario", to: "/app/scenarios", label: "Đọc tình huống" },
-      ];
-      const target = order.find(o => (totals[o.key] ?? 0) < 3) ?? order[0];
-      setNext({ to: target.to, label: target.label });
+      // Tìm lesson đầu tiên trong lộ trình chưa hoàn thành
+      const firstUndone = ALL_LESSONS.find(l => {
+        const ls = getLessonState(l.id);
+        if (ls.done) return false;
+        const serverHits = totals[l.activity] ?? 0;
+        return serverHits < l.threshold;
+      });
+      if (firstUndone) {
+        setNext({ to: lessonHref(firstUndone), label: `Tiếp tục: ${firstUndone.title}` });
+      } else {
+        setNext({ to: "/app/learn", label: "Đã xong lộ trình – ôn tập" });
+      }
     })();
-  }, [user]);
+  }, [user, tick]);
 
   return (
     <div className="space-y-8">

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&display=swap&subset=vietnamese,latin');
 
 @tailwind base;
 @tailwind components;
@@ -75,16 +75,29 @@
 
 @layer base {
   * { @apply border-border; }
-  html, body, #root { height: 100%; }
+  html, body { min-height: 100%; }
+  #root { min-height: 100%; display: flex; flex-direction: column; }
   body {
     @apply bg-background text-foreground;
+    /* Nunito hỗ trợ tiếng Việt đầy đủ, dùng cho text thân */
     font-family: 'Nunito', system-ui, sans-serif;
+    font-weight: 600;
+    line-height: 1.6;
     background: var(--gradient-hero);
     background-attachment: fixed;
   }
+  p, span, label, li {
+    font-weight: 600;
+  }
+  .text-muted-foreground {
+    font-weight: 500;
+  }
   h1, h2, h3, h4, .font-display {
-    font-family: 'Fredoka', 'Nunito', system-ui, sans-serif;
-    letter-spacing: -0.01em;
+    /* Baloo 2 — playful + rounded + đầy đủ tiếng Việt, thay thế Fredoka */
+    font-family: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0em;
+    line-height: 1.25;
   }
 }
 
@@ -118,5 +131,31 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* ASD Personalization: High contrast mode */
+html.high-contrast {
+  --border: 220 30% 70%;
+  --muted: 220 20% 90%;
+  --shadow-soft: 0 4px 12px -4px hsl(218 60% 30% / 0.3), 0 2px 4px -2px hsl(218 60% 30% / 0.2);
+}
+html.high-contrast .card-soft,
+html.high-contrast .card-3d {
+  border-width: 2px;
+}
+
+/* ASD Personalization: No gradients mode */
+html.no-gradients {
+  --gradient-sky: hsl(220 60% 96%);
+  --gradient-sunshine: hsl(42 60% 94%);
+  --gradient-mint: hsl(158 40% 94%);
+  --gradient-bubble: hsl(300 30% 96%);
+  --gradient-hero: hsl(220 60% 98%);
+}
+html.no-gradients .bg-gradient-sky,
+html.no-gradients .bg-gradient-sunshine,
+html.no-gradients .bg-gradient-mint,
+html.no-gradients .bg-gradient-bubble {
+  background: hsl(var(--muted)) !important;
 }
 

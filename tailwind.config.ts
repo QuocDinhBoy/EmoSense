@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['Fredoka', 'Nunito', 'system-ui', 'sans-serif'],
+        display: ['Baloo 2', 'Nunito', 'system-ui', 'sans-serif'],
         body: ['Nunito', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {

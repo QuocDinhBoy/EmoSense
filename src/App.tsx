@@ -35,6 +35,7 @@ const App = () => (
             <Route path="flashcards" element={<Flashcards />} />
             <Route path="match" element={<MatchingGame />} />
             <Route path="camera" element={<CameraPractice />} />
+            <Route path="mirror" element={<CameraPractice />} />
             <Route path="scenarios" element={<Scenarios />} />
             <Route path="stories" element={<Scenarios />} />
             <Route path="journal" element={<Journal />} />

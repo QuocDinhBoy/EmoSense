@@ -23,7 +23,7 @@ const Landing = () => {
       <header className="container flex items-center justify-between py-6">
         <div className="flex items-center gap-2 font-display text-2xl font-bold text-primary">
           <img src={logoMascot} alt="" width={44} height={44} className="w-11 h-11 object-contain drop-shadow-[0_4px_8px_hsl(218_60%_40%/0.3)]" />
-          EmoSense 3D
+          EmoSense
         </div>
         <nav className="flex items-center gap-3">
           <Link to="/auth" className="hidden sm:inline-flex font-display font-semibold text-muted-foreground hover:text-foreground">Dành cho phụ huynh</Link>
@@ -49,13 +49,13 @@ const Landing = () => {
             <Button asChild variant="hero" size="xl"><Link to="/auth">Bắt đầu học</Link></Button>
             <Button asChild variant="outline" size="xl"><a href="#features">Khám phá tính năng</a></Button>
           </div>
-          <div className="flex items-center gap-3 pt-2">
-            {EMOTIONS.slice(0,5).map(e => (
-              <div key={e.key} className="w-12 h-12 rounded-2xl bg-card shadow-soft flex items-center justify-center p-1">
+          <div className="flex flex-wrap items-center gap-2 pt-2">
+            {EMOTIONS.map(e => (
+              <div key={e.key} className="w-11 h-11 rounded-2xl bg-card shadow-soft flex items-center justify-center p-1" title={e.label}>
                 <img src={e.image} alt={e.label} loading="lazy" width={64} height={64} className="w-full h-full object-contain drop-shadow-[0_6px_8px_hsl(218_60%_40%/0.25)]" />
               </div>
             ))}
-            <span className="text-sm text-muted-foreground font-display">7 cảm xúc cốt lõi</span>
+            <span className="text-sm text-muted-foreground font-display">{EMOTIONS.length} cảm xúc cốt lõi</span>
           </div>
         </div>
 
@@ -96,7 +96,7 @@ const Landing = () => {
       </section>
 
       <footer className="container py-10 text-center text-sm text-muted-foreground">
-        EmoSense 3D · Hỗ trợ giáo dục, không phải chẩn đoán y khoa.
+        EmoSense · Hỗ trợ giáo dục, không phải chẩn đoán y khoa.
       </footer>
     </div>
   );

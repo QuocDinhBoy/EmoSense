@@ -1,3 +1,2 @@
-# Welcome to your Lovable project
+# EmoSense Fixing
 
-TODO: Document your project here
